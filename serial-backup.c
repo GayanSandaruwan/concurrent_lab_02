@@ -78,6 +78,8 @@ int main(int argc, char const *argv[])
 		printf("%d",result);
 	}
 
+	printf("%d",Member(24,first_node));
+
 	return 0;
 }
 

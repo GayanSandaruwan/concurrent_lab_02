@@ -3,7 +3,7 @@
 #include <pthread.h>
 #include <time.h>
 
-pthread_mutex_t one_mutex_lock;
+pthread_mutex_t lock;
 struct list_node_s {
     int data;
     struct list_node_s* next;
@@ -95,27 +95,27 @@ int Member(int value, struct list_node_s* head_p) {
         while(1){
             int random_number ;
             if (local_mem_op != 0) {
-                pthread_mutex_lock(&one_mutex_lock);
+                pthread_rwlock_rdlock(&lock);
                 random_number = rand();
                 // printf("%d",Member(random_number, first_node));
                 Member(random_number,first_node);
                 local_mem_op--;
-                pthread_mutex_unlock(&one_mutex_lock);
+                pthread_rwlock_unlock(&lock);
             }
             if (local_ins_op != 0) {
                 random_number = rand();
-                pthread_mutex_lock(&one_mutex_lock);
+                pthread_rwlock_wrlock(&lock);
                 // printf("%d",Insert(random_number, &first_node));
                 Insert(random_number,&first_node);
                 local_ins_op--;
-                pthread_mutex_unlock(&one_mutex_lock);
+                pthread_rwlock_unlock(&lock);
             }
             if (local_del_op != 0) {
                 random_number = rand();
-                pthread_mutex_lock(&one_mutex_lock);
+                pthread_rwlock_wrlock(&lock);
                 Delete(random_number, &first_node);
                 local_del_op--;
-                pthread_mutex_unlock(&one_mutex_lock);
+                pthread_rwlock_unlock(&lock);
             }
 
             if (local_mem_op == 0 && local_ins_op == 0 && local_del_op == 0) {
@@ -160,16 +160,16 @@ int Member(int value, struct list_node_s* head_p) {
 int main(int argc, char const *argv[])
 {
 
-	struct list_node_s* first_node;
+    struct list_node_s* first_node;
     first_node = malloc(sizeof(struct list_node_s));
 
-	// for(int i=0;i<1000;i++){
-	// 	int random_number = rand() % 65535;
-	// 	int result = Insert(random_number, &first_node);
-	// 	printf("%d",result);
-	// }
+    // for(int i=0;i<1000;i++){
+    //  int random_number = rand() % 65535;
+    //  int result = Insert(random_number, &first_node);
+    //  printf("%d",result);
+    // }
 
-	// printf("%d",Member(24,first_node));
+    // printf("%d",Member(24,first_node));
 
     int nodes =  strtol(argv[1], NULL ,10);
     int operations =  strtol(argv[2], NULL ,10);
@@ -234,7 +234,7 @@ int main(int argc, char const *argv[])
     elapsed_time = end_time -start_time;
 
     printf("%li\n", elapsed_time);
-	return 0;
+    return 0;
 }
 
 
